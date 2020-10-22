@@ -1,3 +1,5 @@
+mod day_1;
+
 fn main() {
-    println!("Hello, world!");
+    day_1::parse_frequency_change("+1", 0);
 }
