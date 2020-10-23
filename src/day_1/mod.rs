@@ -13,7 +13,7 @@ fn parse_frequency_change(input: &str, value: i32) -> i32 {
 }
 
 fn calculate_total(start: i32, instructions: Vec<String>) -> i32 {
-    let mut result = start.clone();
+    let mut result = start;
 
     for s in instructions.iter() {
         result = parse_frequency_change(s, result);
