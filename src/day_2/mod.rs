@@ -2,7 +2,7 @@ use crate::common;
 use std::collections::HashMap;
 mod candidate;
 
-fn list_combinations(input: &String) -> candidate::Box {
+fn list_combinations(input: &str) -> candidate::Box {
     let mut has_two = false;
     let mut has_three = false;
 
@@ -13,7 +13,7 @@ fn list_combinations(input: &String) -> candidate::Box {
         *count += 1;
     }
 
-    for (_, value) in &map {
+    for value in map.values() {
         if *value == 2 {
             has_two = true;
         } else if *value == 3 {
@@ -24,7 +24,7 @@ fn list_combinations(input: &String) -> candidate::Box {
     candidate::Box { has_two, has_three }
 }
 
-fn calculate_checksum(input: &Vec<String>) -> i32 {
+fn calculate_checksum(input: &[String]) -> i32 {
     let mut twos = 0;
     let mut threes = 0;
 
