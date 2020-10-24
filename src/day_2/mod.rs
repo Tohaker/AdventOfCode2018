@@ -24,7 +24,7 @@ fn list_combinations(input: &str) -> candidate::Box {
     candidate::Box { has_two, has_three }
 }
 
-fn calculate_checksum(input: &[String]) -> i32 {
+fn calculate_checksum(input: Vec<String>) -> i32 {
     let mut twos = 0;
     let mut threes = 0;
 
@@ -43,7 +43,7 @@ pub fn part_1() {
 
     if let Ok(lines) = common::read_lines(filename) {
         let instructions = lines.map(|l| l.expect("Could not parse line")).collect();
-        println!("Day 2 - Part 1: {}", calculate_checksum(&instructions));
+        println!("Day 2 - Part 1: {}", calculate_checksum(instructions));
     }
 }
 
@@ -141,6 +141,6 @@ mod tests {
             String::from("ababab"),
         ];
 
-        assert_eq!(12, calculate_checksum(&input));
+        assert_eq!(12, calculate_checksum(input));
     }
 }
