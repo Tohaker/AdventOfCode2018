@@ -24,11 +24,11 @@ fn determine_shifts(input: Vec<Schedule>) -> HashMap<u32, (u32, u32, u32)> {
         let time = schedule.datetime().minute();
 
         if msg.contains("Guard") {
-            let start_idx = msg.find("#").unwrap();
+            let start_idx = msg.find('#').unwrap();
             let end_idx = msg.find("begins").unwrap();
 
             last_id = (&msg[start_idx + 1..end_idx - 1]).parse::<u32>().unwrap();
-            minute_tracker.entry(last_id).or_insert(HashMap::new());
+            minute_tracker.entry(last_id).or_insert_with(HashMap::new);
             continue;
         }
 
