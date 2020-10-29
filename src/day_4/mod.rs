@@ -12,7 +12,7 @@ fn order_records(input: Vec<String>) -> Vec<Schedule> {
 }
 
 // Key: Guard ID, Value: (Sleep length, Most common minute)
-fn determine_shifts(input: Vec<Schedule>) -> HashMap<u32, (u32, u32)> {
+fn determine_shifts(input: Vec<Schedule>) -> HashMap<u32, (u32, u32, u32)> {
     // Map the Guard ID to all the minutes he's asleep, and how many times he is asleep at that minute.
     let mut minute_tracker: HashMap<u32, HashMap<u32, u32>> = HashMap::new();
     let mut start_min = 0;
@@ -49,28 +49,27 @@ fn determine_shifts(input: Vec<Schedule>) -> HashMap<u32, (u32, u32)> {
         }
     }
 
-    let mut result: HashMap<u32, (u32, u32)> = HashMap::new();
+    let mut result: HashMap<u32, (u32, u32, u32)> = HashMap::new();
 
     for (key, value) in minute_tracker.iter() {
-        let most_common_min = value
+        let (most_common_min, common_min_count) = value
             .iter()
             .max_by(|a, b| a.1.cmp(&b.1))
-            .map(|(k, _)| k)
-            .unwrap_or(&0);
+            .unwrap_or((&0, &0));
         let total_minutes: u32 = value.values().sum();
 
-        result.insert(*key, (total_minutes, *most_common_min));
+        result.insert(*key, (total_minutes, *most_common_min, *common_min_count));
     }
 
     result
 }
 
-fn calculate_answer(input: HashMap<u32, (u32, u32)>) -> u32 {
+fn calculate_strategy_1(input: HashMap<u32, (u32, u32, u32)>) -> u32 {
     let mut max_len = 0;
     let mut current_guard = 0;
     let mut current_common = 0;
 
-    for (guard, (length, common)) in input.iter() {
+    for (guard, (length, common, _)) in input.iter() {
         if max_len < *length {
             max_len = *length;
             current_guard = *guard;
@@ -81,6 +80,22 @@ fn calculate_answer(input: HashMap<u32, (u32, u32)>) -> u32 {
     current_common * current_guard
 }
 
+fn calculate_strategy_2(input: HashMap<u32, (u32, u32, u32)>) -> u32 {
+    let mut max_count = 0;
+    let mut current_guard = 0;
+    let mut current_min = 0;
+
+    for (guard, (_, minute, count)) in input.iter() {
+        if max_count < *count {
+            max_count = *count;
+            current_guard = *guard;
+            current_min = *minute;
+        }
+    }
+
+    current_min * current_guard
+}
+
 pub fn part_1() {
     let filename = "./inputs/day_4/input.txt";
 
@@ -88,8 +103,20 @@ pub fn part_1() {
         let input = lines.map(|l| l.expect("Could not parse line")).collect();
         let sorted = order_records(input);
         let shifts = determine_shifts(sorted);
-        let result = calculate_answer(shifts);
+        let result = calculate_strategy_1(shifts);
         println!("Day 4 - Part 1: {}", result);
+    }
+}
+
+pub fn part_2() {
+    let filename = "./inputs/day_4/input.txt";
+
+    if let Ok(lines) = common::read_lines(filename) {
+        let input = lines.map(|l| l.expect("Could not parse line")).collect();
+        let sorted = order_records(input);
+        let shifts = determine_shifts(sorted);
+        let result = calculate_strategy_2(shifts);
+        println!("Day 4 - Part 2: {}", result);
     }
 }
 
@@ -149,9 +176,9 @@ mod tests {
         let sorted = order_records(input);
         let shifts = determine_shifts(sorted);
 
-        let mut expected: HashMap<u32, (u32, u32)> = HashMap::new();
-        expected.insert(10, (50, 24));
-        expected.insert(99, (30, 45));
+        let mut expected: HashMap<u32, (u32, u32, u32)> = HashMap::new();
+        expected.insert(10, (50, 24, 2));
+        expected.insert(99, (30, 45, 3));
 
         assert_eq!(expected, shifts);
     }
@@ -180,8 +207,37 @@ mod tests {
 
         let sorted = order_records(input);
         let shifts = determine_shifts(sorted);
-        let result = calculate_answer(shifts);
+        let result = calculate_strategy_1(shifts);
 
         assert_eq!(240, result);
+    }
+
+    #[test]
+    fn should_find_sleepiest_guard_part_2() {
+        let input = vec![
+            "[1518-11-01 00:00] Guard #10 begins shift".to_string(),
+            "[1518-11-01 00:05] falls asleep".to_string(),
+            "[1518-11-01 00:25] wakes up".to_string(),
+            "[1518-11-01 00:30] falls asleep".to_string(),
+            "[1518-11-01 00:55] wakes up".to_string(),
+            "[1518-11-01 23:58] Guard #99 begins shift".to_string(),
+            "[1518-11-02 00:40] falls asleep".to_string(),
+            "[1518-11-02 00:50] wakes up".to_string(),
+            "[1518-11-03 00:05] Guard #10 begins shift".to_string(),
+            "[1518-11-03 00:24] falls asleep".to_string(),
+            "[1518-11-03 00:29] wakes up".to_string(),
+            "[1518-11-04 00:02] Guard #99 begins shift".to_string(),
+            "[1518-11-04 00:36] falls asleep".to_string(),
+            "[1518-11-04 00:46] wakes up".to_string(),
+            "[1518-11-05 00:03] Guard #99 begins shift".to_string(),
+            "[1518-11-05 00:45] falls asleep".to_string(),
+            "[1518-11-05 00:55] wakes up".to_string(),
+        ];
+
+        let sorted = order_records(input);
+        let shifts = determine_shifts(sorted);
+        let result = calculate_strategy_2(shifts);
+
+        assert_eq!(4455, result);
     }
 }
