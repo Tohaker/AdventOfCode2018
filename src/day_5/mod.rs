@@ -20,7 +20,6 @@ fn process_polymer(polymer: &str) -> String {
                 let unit: String = chars[i..=i + 1].iter().collect();
                 if check_unit(unit.as_str()) {
                     result.replace_range(i..=i + 1, "");
-                    println!("{}", result);
                     changed += 1;
                     break;
                 }
