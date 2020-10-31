@@ -1,4 +1,5 @@
 use crate::common;
+use std::collections::HashMap;
 
 fn check_unit(unit: &str) -> bool {
     let mut chars: Vec<char> = unit.chars().collect();
@@ -10,28 +11,46 @@ fn check_unit(unit: &str) -> bool {
 }
 
 fn process_polymer(polymer: &str) -> String {
-    let mut result: String = polymer.to_string();
+    let mut buffer: Vec<char> = Vec::new();
 
-    loop {
-        let chars: Vec<char> = result.chars().collect();
-        let mut changed = 0;
-        if !chars.is_empty() {
-            for i in 0..chars.len() - 1 {
-                let unit: String = chars[i..=i + 1].iter().collect();
-                if check_unit(unit.as_str()) {
-                    result.replace_range(i..=i + 1, "");
-                    changed += 1;
-                    break;
-                }
-            }
-        }
-
-        if changed == 0 {
-            break;
+    for c in polymer.chars() {
+        if !buffer.is_empty() && check_unit(&format!("{}{}", c, buffer.last().unwrap())) {
+            buffer.pop();
+        } else {
+            buffer.push(c);
         }
     }
 
-    result
+    buffer.iter().collect()
+}
+
+fn shortest_possible_polymer(polymer: &str) -> usize {
+    let current = process_polymer(&polymer);
+    let lowercase = current.to_ascii_lowercase();
+
+    let mut frequency: HashMap<char, u32> = HashMap::new();
+    for c in lowercase.chars() {
+        *frequency.entry(c).or_insert(0) += 1;
+    }
+
+    let present_letters: Vec<char> = frequency
+        .iter()
+        .filter(|&(_, v)| *v > 0)
+        .map(|(k, _)| *k)
+        .collect();
+
+    let mut lowest = current.len();
+
+    for l in present_letters.iter() {
+        let new_polymer = polymer.replace(&[*l, l.to_ascii_uppercase()][..], "");
+        let len = process_polymer(&new_polymer).len();
+
+        if len < lowest {
+            lowest = len;
+        }
+    }
+
+    lowest
 }
 
 pub fn part_1() {
@@ -42,6 +61,17 @@ pub fn part_1() {
             .map(|l| l.expect("Could not parse line"))
             .collect::<String>();
         println!("Day 5 - Part 1: {}", process_polymer(&polymer).len());
+    }
+}
+
+pub fn part_2() {
+    let filename = "./inputs/day_5/input.txt";
+
+    if let Ok(lines) = common::read_lines(filename) {
+        let polymer = lines
+            .map(|l| l.expect("Could not parse line"))
+            .collect::<String>();
+        println!("Day 5 - Part 2: {}", shortest_possible_polymer(&polymer));
     }
 }
 
@@ -83,5 +113,10 @@ mod tests {
 
         let input = "dabAcCaCBAcCcaDA";
         assert_eq!("dabCBAcaDA".to_string(), process_polymer(input));
+    }
+    #[test]
+    fn should_get_shortest_possible_polymer() {
+        let input = "dabAcCaCBAcCcaDA";
+        assert_eq!(4, shortest_possible_polymer(input));
     }
 }
