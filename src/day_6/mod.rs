@@ -86,6 +86,29 @@ fn parse_point(point: &str) -> (i32, i32) {
     (x, y)
 }
 
+fn sum_distances(point: &(i32, i32), map: &[(i32, i32)]) -> i32 {
+    map.iter()
+        .fold(0, |acc, c| acc + calculate_distance(c, point))
+}
+
+fn determine_region(map: &[(i32, i32)], max_distance: i32) -> Vec<(i32, i32)> {
+    let (x_max, y_max) = calculate_map_bounds(map);
+
+    let mut result: Vec<(i32, i32)> = Vec::new();
+
+    for x in 0..=x_max {
+        for y in 0..=y_max {
+            let dist = sum_distances(&(x, y), map);
+
+            if dist < max_distance {
+                result.push((x, y));
+            }
+        }
+    }
+
+    result
+}
+
 pub fn part_1() {
     let filename = "./inputs/day_6/input.txt";
 
@@ -104,6 +127,21 @@ pub fn part_1() {
             .unwrap();
 
         println!("Day 6 - Part 1: {}", largest_area);
+    }
+}
+
+pub fn part_2() {
+    let filename = "./inputs/day_6/input.txt";
+
+    if let Ok(lines) = common::read_lines(filename) {
+        let points: Vec<(i32, i32)> = lines
+            .map(|l| l.expect("Could not parse line"))
+            .map(|l| parse_point(&l))
+            .collect();
+
+        let region_size = determine_region(&points, 10000).len();
+
+        println!("Day 6 - Part 2: {}", region_size);
     }
 }
 
@@ -153,5 +191,21 @@ mod tests {
         let input = "46, 246";
 
         assert_eq!((46, 246), parse_point(input));
+    }
+
+    #[test]
+    fn should_sum_distances() {
+        let point = (4, 3);
+        let map = vec![(1, 1), (1, 6), (8, 3), (3, 4), (5, 5), (8, 9)];
+
+        assert_eq!(30, sum_distances(&point, &map));
+    }
+
+    #[test]
+    fn should_find_points_within_region() {
+        let map = vec![(1, 1), (1, 6), (8, 3), (3, 4), (5, 5), (8, 9)];
+        let maximum = 32;
+
+        assert_eq!(16, determine_region(&map, maximum).len());
     }
 }
