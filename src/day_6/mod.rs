@@ -6,7 +6,7 @@ fn calculate_distance(p1: &(i32, i32), p2: &(i32, i32)) -> i32 {
     (p1.0 - p2.0).abs() + (p1.1 - p2.1).abs()
 }
 
-fn calculate_map_bounds(map: &Vec<(i32, i32)>) -> (i32, i32) {
+fn calculate_map_bounds(map: &[(i32, i32)]) -> (i32, i32) {
     let x_max = *map
         .iter()
         .max_by(|a, b| a.0.cmp(&b.0))
@@ -21,7 +21,7 @@ fn calculate_map_bounds(map: &Vec<(i32, i32)>) -> (i32, i32) {
     (x_max, y_max)
 }
 
-fn determine_closest_points(input: &Vec<(i32, i32)>) -> HashMap<usize, Vec<(i32, i32)>> {
+fn determine_closest_points(input: &[(i32, i32)]) -> HashMap<usize, Vec<(i32, i32)>> {
     let (x_max, y_max) = calculate_map_bounds(input);
 
     let mut result: HashMap<usize, Vec<(i32, i32)>> = HashMap::new();
@@ -48,7 +48,10 @@ fn determine_closest_points(input: &Vec<(i32, i32)>) -> HashMap<usize, Vec<(i32,
             if all_equal {
                 continue;
             } else {
-                result.entry(input_index).or_insert(Vec::new()).push((x, y))
+                result
+                    .entry(input_index)
+                    .or_insert_with(Vec::new)
+                    .push((x, y))
             }
         }
     }
@@ -57,7 +60,7 @@ fn determine_closest_points(input: &Vec<(i32, i32)>) -> HashMap<usize, Vec<(i32,
 }
 
 fn remove_edge_locations(
-    map: &Vec<(i32, i32)>,
+    map: &[(i32, i32)],
     input: HashMap<usize, Vec<(i32, i32)>>,
 ) -> HashMap<usize, Vec<(i32, i32)>> {
     let (x_max, y_max) = calculate_map_bounds(map);
