@@ -25,7 +25,7 @@ fn process_polymer(polymer: &str) -> String {
 }
 
 fn shortest_possible_polymer(polymer: &str) -> usize {
-    let current = process_polymer(&polymer);
+    let current = process_polymer(polymer);
     let lowercase = current.to_ascii_lowercase();
 
     let mut frequency: HashMap<char, u32> = HashMap::new();

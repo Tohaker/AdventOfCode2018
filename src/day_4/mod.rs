@@ -52,10 +52,8 @@ fn determine_shifts(input: Vec<Schedule>) -> HashMap<u32, (u32, u32, u32)> {
     let mut result: HashMap<u32, (u32, u32, u32)> = HashMap::new();
 
     for (key, value) in minute_tracker.iter() {
-        let (most_common_min, common_min_count) = value
-            .iter()
-            .max_by(|a, b| a.1.cmp(&b.1))
-            .unwrap_or((&0, &0));
+        let (most_common_min, common_min_count) =
+            value.iter().max_by(|a, b| a.1.cmp(b.1)).unwrap_or((&0, &0));
         let total_minutes: u32 = value.values().sum();
 
         result.insert(*key, (total_minutes, *most_common_min, *common_min_count));
