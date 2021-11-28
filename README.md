@@ -1,7 +1,7 @@
 # Advent of Code 2018
 
 Are the tests passing?   
-[![Continuous integration Actions Status](https://github.com/tohaker/AdventOfCode2018/workflows/Continuous%20integration/badge.svg)](https://github.com/tohaker/AdventOfCode2018/actions)
+[![Continuous integration Actions Status](https://github.com/tohaker/AdventOfCode2018/workflows/Checks%20and%20Test/badge.svg)](https://github.com/tohaker/AdventOfCode2018/actions)
 
 My own solutions to the [Advent of Code 2018](https://adventofcode.com/2018). 
 
